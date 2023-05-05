@@ -1,0 +1,42 @@
+import { useState, useEffect } from "react";
+import apiCall from "../../api/Api";
+import styles from "../../assets/css/Assignation.module.css";
+import { Form } from "react-bulma-components";
+
+export default function NomMoyenTransportField(props) {
+  const { setNomMoyenTransportId } = props;
+  const [nomMoyenTransports, setNomMoyenTransports] = useState(null);
+  useEffect(() => {
+    async function fetchMoyenTransport() {
+      const endpoint = `nomMoyenTransport/`;
+      const method = "GET";
+      const responseData = await apiCall(endpoint, method);
+      setNomMoyenTransports(responseData.data);
+    }
+    fetchMoyenTransport();
+  }, []);
+  const handleChoice = (e) => {
+    setNomMoyenTransportId(e.target.value);
+  };
+
+  return (
+    <Form.Field>
+      <Form.Label>Moyen de transport</Form.Label>
+      <Form.Control>
+        <Form.Select
+          className={styles.select}
+          onChange={handleChoice}
+          fullwidth
+        >
+          <option value={null}></option>
+          {nomMoyenTransports &&
+            nomMoyenTransports.map((moyenTransport) => {
+              return (
+                <option value={moyenTransport.id}>{moyenTransport.nom}</option>
+              );
+            })}
+        </Form.Select>
+      </Form.Control>
+    </Form.Field>
+  );
+}

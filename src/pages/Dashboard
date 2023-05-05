@@ -1,0 +1,62 @@
+import { Columns } from "react-bulma-components";
+import CamionDetail from "../Components/transportDetail/TransportDetail";
+import SimpleCard from "../Components/card/SimpleStatCard";
+import ChauffeurList from "../Components/chauffeurList/ChauffeurList";
+import FindMtrForm from "../Components/findMoyenTransport/FindMtrForm";
+import { useEffect, useState } from "react";
+import apiCall from "../api/Api";
+import { useParams } from "react-router-dom";
+
+function Dashboard() {
+    const { assignationId } = useParams();
+    const [assignationDetail, setAssignationDetail] = useState(null);
+    useEffect(() => {
+        async function fetchData() {
+            const endpoint = `statistics/${assignationId}`;
+            const method = 'GET';
+            const responseData = await apiCall(endpoint, method);
+            setAssignationDetail(responseData.data[0]);
+        }
+        fetchData();
+    }, [assignationId]);
+
+    return (
+        <div className="container pt-5">
+            <h1 className="title is-2 has-text-centered"  >Tableau de bord</h1>
+            <Columns>
+                <Columns.Column className="is-4 is-centered">
+                    <FindMtrForm />
+                </Columns.Column>
+            </Columns>
+            {assignationDetail &&
+                <>
+                    <Columns>
+                        <Columns.Column>
+                            <SimpleCard title="Total paye" price={assignationDetail.totalpaye} />
+                        </Columns.Column>
+                        <Columns.Column>
+                            <SimpleCard title="Total non paye" price={assignationDetail.totalnonpaye} />
+                        </Columns.Column>
+                        <Columns.Column>
+                            <SimpleCard title="Total" price={assignationDetail.total} />
+                        </Columns.Column>
+                    </Columns>
+
+                    <Columns>
+                        <Columns.Column>
+                            <ChauffeurList chauffeurArray={assignationDetail.assignationvoyage.chauffeur_assignationvoyage} />
+                        </Columns.Column>
+                    </Columns>
+                </>
+            }
+
+            <h1 className="title is-3 has-text-centered" >Detail du camion</h1>
+            <Columns>
+                <Columns.Column>
+                    <CamionDetail assignationId={assignationId} />
+                </Columns.Column>
+            </Columns>
+        </div>
+    );
+}
+export default Dashboard;

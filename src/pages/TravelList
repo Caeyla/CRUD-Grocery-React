@@ -1,0 +1,229 @@
+import { useState } from "react";
+import {
+  Button,
+  Card,
+  Columns,
+  Container,
+  Form,
+  Heading,
+} from "react-bulma-components";
+import styles from "../assets/css/TravelList.module.css";
+
+function TravelList() {
+  const staticTravels = [
+    {
+      id: 1,
+      transport: "Avion",
+      immatriculation: "ABC123",
+      date: "2022-05-15",
+      photo: "photo1.jpg",
+      destination: "Paris",
+    },
+    {
+      id: 2,
+      transport: "Fourgon",
+      immatriculation: "XYZ789",
+      date: "2022-06-20",
+      photo: "photo2.jpg",
+      destination: "Lyon",
+    },
+    {
+      id: 3,
+      transport: "Camion",
+      immatriculation: "DEF456",
+      date: "2022-07-01",
+      photo: "photo3.jpg",
+      destination: "Marseille",
+    },
+    {
+      id: 4,
+      transport: "Sprinter",
+      immatriculation: "GHI789",
+      date: "2022-08-10",
+      photo: "photo4.jpg",
+      destination: "Nice",
+    },
+    {
+      id: 5,
+      transport: "Avion",
+      immatriculation: "JKL012",
+      date: "2022-09-05",
+      photo: "photo5.jpg",
+      destination: "Bordeaux",
+    },
+    {
+      id: 6,
+      transport: "Fourgon",
+      immatriculation: "MNO345",
+      date: "2022-10-15",
+      photo: "photo6.jpg",
+      destination: "Toulouse",
+    },
+    {
+      id: 7,
+      transport: "Camion",
+      immatriculation: "PQR678",
+      date: "2022-11-01",
+      photo: "photo7.jpg",
+      destination: "Strasbourg",
+    },
+    {
+      id: 8,
+      transport: "Sprinter",
+      immatriculation: "STU901",
+      date: "2022-12-25",
+      photo: "photo8.jpg",
+      destination: "Montpellier",
+    },
+    {
+      id: 9,
+      transport: "Avion",
+      immatriculation: "VWX234",
+      date: "2023-01-10",
+      photo: "photo9.jpg",
+      destination: "Rennes",
+    },
+    {
+      id: 10,
+      transport: "Fourgon",
+      immatriculation: "YZA567",
+      date: "2023-02-20",
+      photo: "photo10.jpg",
+      destination: "Nantes",
+    },
+  ];
+  const [travels, setTravels] = useState(staticTravels); // Liste de voyages à afficher
+  const [currentPage, setCurrentPage] = useState(1); // Page actuelle
+  const [travelsPerPage, setTravelsPerPage] = useState(5); // Nombre de voyages par page
+  const [filters, setFilters] = useState({
+    date: "",
+    transport: "",
+    immatriculation: "",
+  }); // Filtres appliqués à la liste de voyages
+
+  // Fonction pour filtrer les voyages
+  const filteredTravels = travels.filter((travel) => {
+    let dateMatch = true;
+    let transportMatch = true;
+    let immatriculationMatch = true;
+
+    if (filters.date) {
+      dateMatch = travel.date === filters.date;
+    }
+    if (filters.transport) {
+      const transportFilter = filters.transport.toLowerCase();
+      transportMatch = travel.transport.toLowerCase().includes(transportFilter);
+    }
+    if (filters.immatriculation) {
+      const immatriculationFilter = filters.immatriculation.toLowerCase();
+      immatriculationMatch = travel.immatriculation
+        .toLowerCase()
+        .includes(immatriculationFilter);
+    }
+    return dateMatch && transportMatch && immatriculationMatch;
+  });
+
+  // Fonction pour changer de page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Calcul du nombre de pages
+  const totalPages = Math.ceil(filteredTravels.length / travelsPerPage);
+
+  // Index du premier et du dernier voyage de la page actuelle
+  const indexOfLastTravel = currentPage * travelsPerPage;
+  const indexOfFirstTravel = indexOfLastTravel - travelsPerPage;
+
+  // Liste des voyages à afficher sur la page actuelle
+  const currentTravels = filteredTravels.slice(
+    indexOfFirstTravel,
+    indexOfLastTravel
+  );
+
+  return (
+    <Container style={{ padding: 2 + "vmin" }}>
+      <Heading>Liste des voyages cette semaine</Heading>
+      {/* Filtres */}
+      <Form.Field kind="group" className="is-flex-wrap-wrap">
+        <Form.Control className="mb-3">
+          <Form.Input
+            type="date"
+            placeholder="Date"
+            onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+          />
+        </Form.Control>
+        <Form.Control className="mb-3">
+          <Form.Input
+            type="text"
+            placeholder="Transport"
+            onChange={(e) =>
+              setFilters({ ...filters, transport: e.target.value })
+            }
+          />
+        </Form.Control>
+        <Form.Control>
+          <Form.Input
+            type="text"
+            placeholder="Immatriculation"
+            onChange={(e) =>
+              setFilters({ ...filters, immatriculation: e.target.value })
+            }
+          />
+        </Form.Control>
+      </Form.Field>
+
+      {/* Liste des voyages */}
+      <Columns className="pt-5">
+        {currentTravels.map((travel) => (
+          <Columns.Column size={3}>
+            <Card key={travel.id}>
+              <Card.Image
+                top
+                width="100%"
+                // src={travel.photo}
+                src="http://bulma.io/images/placeholders/1280x960.png"
+                alt={travel.destination}
+              />
+              <Card.Content style={{ padding: 1 + "rem" }}>
+                <Heading size={5}>{travel.destination}</Heading>
+                <span tag="h6" className="mb-2 text-muted">
+                  {travel.transport} - {travel.immatriculation}
+                </span>
+                <br></br>
+                <label>{travel.date}</label>
+              </Card.Content>
+            </Card>
+          </Columns.Column>
+        ))}
+      </Columns>
+
+      {/* Pagination */}
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        paginate={paginate}
+      />
+    </Container>
+  );
+}
+
+function Pagination({ totalPages, currentPage, paginate }) {
+  const pageNumbers = [];
+
+  // Liste des numéros de page à afficher
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <div className={styles.pagination}>
+      {/* Boutons de pagination */}
+      {pageNumbers.map((number) => (
+        <Button key={number} onClick={() => paginate(number)}>
+          {number}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
+export default TravelList;

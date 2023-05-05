@@ -1,0 +1,33 @@
+import { useState } from 'react';
+import FindMtrModal from './FindMtrModal';
+export default function FindMtrForm(props) {
+    const [date, setDate] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleDate = (e) => {
+        setDate(new Date(e.target.value));
+    }
+    const handleMtrFinding = () => {
+        setIsModalOpen(true);
+    }
+    return (
+        <>
+            <div className="field is-horizontal">
+                <div className="field-body">
+                    <div className="field">
+                        <p className="control">
+                            <input className="input is-info" onChange={handleDate} type="date" />
+                        </p>
+                    </div>
+                    <div className="field">
+                        <div className="control">
+                            <button onClick={handleMtrFinding} className="button is-info">
+                                Chercher
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <FindMtrModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
+            </div>
+        </>
+    );
+}

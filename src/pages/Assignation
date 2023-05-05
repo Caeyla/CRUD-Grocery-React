@@ -1,0 +1,219 @@
+import styles from "../assets/css/Assignation.module.css";
+import "../assets/bulma/bulma.min.css";
+import { useState } from "react";
+import apiCall from "../api/Api";
+import ModalDestination from "./ModalDestination";
+import ModalChauffeur from "./ModalChauffeur";
+
+import {
+  Button,
+  Columns,
+  Container,
+  Form,
+  Heading,
+  Modal,
+} from "react-bulma-components";
+import { ReactComponent as SVGPlus } from "../assets/svg/add-svgrepo-com.svg";
+import NomMoyenTransportField from "../Components/nomMoyenField/NomMoyenField";
+import ImmatriculationField from "../Components/immatriculField/ImmatriculeField";
+
+function Assignation() {
+  const [nomMoyenTransportId, setNomMoyenTransportId] = useState(null);
+  const [moyenTransportId, setMoyenTransportId] = useState(null);
+  const [chauffeurs, setChauffeurs] = useState([]);
+  const [isModalOpenDest, setIsModalOpenDest] = useState(false);
+  const [isModalOpenChauff, setIsModalOpenChauff] = useState(false);
+
+  const [destination, setDestination] = useState(null);
+  const [dateDepart, setDateDepart] = useState(null);
+
+  const deleteChauffeur = (id) => {
+    setChauffeurs((prevChauffeurs) =>
+      prevChauffeurs.filter((c) => c.id !== id)
+    );
+  };
+  const sendData = async () => {
+    const endpoint = "assignationvoyage";
+    const method = "POST";
+    const body = {
+      assignation: {
+        datedepart: dateDepart,
+        adminId: adminId,
+        transportId: moyenTransportId,
+        destinationId: destination.id,
+      },
+      chauffeurs,
+    };
+    const result = await apiCall(endpoint, method, body);
+    if (result.data) {
+      alert("insertion reussie !");
+    }
+  };
+  const adminId = "ADMIN1";
+
+  const handleDestinationChange = (event) => {
+    setDestination(event.target.value);
+  };
+
+  const handleDateDepart = (event) => {
+    setDateDepart(event.target.value);
+  };
+  const chauffeurModalProps = {
+    chauffeurs,
+    setChauffeurs,
+    adminId,
+  };
+  const immatriculFieldProps = {
+    nomMoyenTransportId,
+    setMoyenTransportId,
+    adminId,
+    datedepart: dateDepart,
+    destinationId: destination !== null ? destination.id : null,
+  };
+
+  return (
+    <Container style={{ padding: 2 + "vmin" }}>
+      <Heading align="center">Assignation de voyage</Heading>
+
+      <div style={{ paddingTop: 2 + "em" }}>
+        <Columns>
+          <Columns.Column size={6}>
+            <NomMoyenTransportField
+              setNomMoyenTransportId={setNomMoyenTransportId}
+            />
+          </Columns.Column>
+          <Columns.Column size={6}>
+            {nomMoyenTransportId && destination && dateDepart && (
+              <ImmatriculationField {...immatriculFieldProps} />
+            )}
+          </Columns.Column>
+          <Columns.Column size={6}>
+            <div className={styles.right}>
+              <div>
+                <Form.Label>Destination</Form.Label>
+                <span onClick={() => setIsModalOpenDest(true)}>
+                  <SVGPlus />
+                </span>
+              </div>
+              <div>
+                <Form.Label>Chauffeur</Form.Label>
+                <span onClick={() => setIsModalOpenChauff(true)}>
+                  <SVGPlus />
+                </span>
+              </div>
+            </div>
+          </Columns.Column>
+        </Columns>
+
+        <Columns>
+          <Columns.Column>
+            <div>
+              <span className={styles.subtitle}>
+                <b>Destination :</b>
+              </span>
+              <span id="ville"></span>
+            </div>
+          </Columns.Column>
+        </Columns>
+
+        <Columns>
+          <Columns.Column>
+            <div>
+              <span className={styles.subtitle}>
+                <b>Chauffeur(s) :</b>
+              </span>
+              <ul id="chauffeur" className={styles.listeChauffeur}>
+                {chauffeurs &&
+                  chauffeurs.map((chauffeur) => {
+                    return (
+                      <li style={{ margin: "1%" }} id={chauffeur.id}>
+                        {chauffeur.nom} {chauffeur.prenom}{" "}
+                        <span
+                          className="button is-danger is-outlined"
+                          onClick={() => {
+                            deleteChauffeur(chauffeur.id);
+                          }}
+                        >
+                          <span>Supprimer</span>
+                        </span>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          </Columns.Column>
+        </Columns>
+        <Columns>
+          <Columns.Column size={6}>
+            <Form.Field>
+              <Form.Label>Date de depart</Form.Label>
+              <Form.Control>
+                <Form.Input type="date" onChange={handleDateDepart} />
+              </Form.Control>
+            </Form.Field>
+          </Columns.Column>
+        </Columns>
+        <Columns>
+          <Columns.Column size={6}>
+            <Form.Field>
+              <Form.Label>Date de disponibilite</Form.Label>
+              <Form.Control>
+                <Form.Input type="date" />
+              </Form.Control>
+            </Form.Field>
+          </Columns.Column>
+        </Columns>
+
+        <Columns>
+          <Columns.Column>
+            <Button
+              onClick={sendData}
+              className={styles.button}
+              style={{ width: 7 + "em" }}
+            >
+              Valider
+            </Button>
+          </Columns.Column>
+        </Columns>
+      </div>
+      <Modal show={isModalOpenDest} onClose={() => setIsModalOpenDest(false)}>
+        <Modal.Card style={{ padding: 2 + "vmin" }}>
+          <Modal.Card.Header style={{ backgroundColor: "teal" }}>
+            <Modal.Card.Title style={{ color: "white" }}>
+              Recherche Destination
+            </Modal.Card.Title>
+          </Modal.Card.Header>
+          <Modal.Card.Body className={styles.modalCardBody}>
+            <ModalDestination
+              isOk={isModalOpenDest}
+              setDestination={setDestination}
+              setIsOk={setIsModalOpenDest}
+            />
+          </Modal.Card.Body>
+        </Modal.Card>
+      </Modal>
+
+      <Modal
+        show={isModalOpenChauff}
+        onClose={() => setIsModalOpenChauff(false)}
+      >
+        <Modal.Card style={{ padding: 2 + "vmin" }}>
+          <Modal.Card.Header style={{ backgroundColor: "teal" }}>
+            <Modal.Card.Title style={{ color: "white" }}>
+              Recherche Chauffeur
+            </Modal.Card.Title>
+          </Modal.Card.Header>
+          <Modal.Card.Body className={styles.modalCardBody}>
+            <ModalChauffeur
+              isOk={isModalOpenChauff}
+              setIsOk={setIsModalOpenChauff}
+              {...chauffeurModalProps}
+            />
+          </Modal.Card.Body>
+        </Modal.Card>
+      </Modal>
+    </Container>
+  );
+}
+
+export default Assignation;

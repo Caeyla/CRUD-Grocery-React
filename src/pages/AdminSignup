@@ -1,0 +1,191 @@
+import { useState } from "react";
+import {
+  Box,
+  Button,
+  Columns,
+  Container,
+  Form,
+  Heading,
+} from "react-bulma-components";
+import styles from "../assets/css/AdminSignup.module.css";
+import getApiUrl from "../Config/Config.js";
+import axios from "axios";
+import Message from "../Components/Message";
+
+function AdminSignup() {
+  const [nomComplet, setNomComplet] = useState("");
+  const [pseudo, setPseudo] = useState("");
+  const [mdp, setMdp] = useState("");
+  const [numtel, setNumTel] = useState("");
+  const [sexe, setSexe] = useState("");
+  const [status, setStatus] = useState("admin"); // Valeur par défaut pour le bouton radio status
+
+  const [type, setType] = useState("");
+  const [message, setMessage] = useState("");
+
+  const apiUrl = getApiUrl();
+
+  const handleNomChange = (e) => {
+    setNomComplet(e.target.value);
+  };
+
+  const handlePseudoChange = (e) => {
+    setPseudo(e.target.value);
+  };
+
+  const handleMdpChange = (e) => {
+    setMdp(e.target.value);
+  };
+
+  const handleNumTelChange = (e) => {
+    setNumTel(e.target.value);
+  };
+
+  const handleSexeChange = (e) => {
+    setSexe(e.target.value);
+  };
+
+  const handleStatusChange = (e) => {
+    setStatus(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Envoyer les données au backend pour l'inscription de l'admin
+    const data = {
+      pseudo,
+      nomComplet,
+      sexe,
+      numtel,
+      mdp,
+      status
+    };
+    console.log(data);
+    axios
+      .post(apiUrl + "admin/signin", data)
+      .then((response) => {
+        if (response.headers["content-type"] === "text/html; charset=utf-8") {
+          setType("error");
+          setMessage(response.data + "");
+        } else {
+          setType("success");
+          setMessage("Inscription réussie!");
+        }
+      })
+      .catch((error) => {
+        setType("error");
+        setMessage("Une erreur est survenue lors de l'inscription " + error);
+      });
+  };
+  return (
+    <Container className={styles.container}>
+      <Columns>
+        <Columns.Column size={6} style={{ margin: "auto" }}>
+          <Box>
+            <Heading>Inscription Administrateur</Heading>
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <Form.Field>
+                <Form.Label>Nom complet:</Form.Label>
+                <Form.Control>
+                  <Form.Input
+                    type="text"
+                    value={nomComplet}
+                    onChange={handleNomChange}
+                    placeholder="nom complet"
+                  />
+                </Form.Control>
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label>Pseudo:</Form.Label>
+                <Form.Control>
+                  <Form.Input
+                    type="text"
+                    value={pseudo}
+                    onChange={handlePseudoChange}
+                    placeholder="Pseudo"
+                  />
+                </Form.Control>
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label>Mot de passe:</Form.Label>
+                <Form.Control>
+                  <Form.Input
+                    type="password"
+                    value={mdp}
+                    onChange={handleMdpChange}
+                    placeholder="Mot de passe"
+                  />
+                </Form.Control>
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label>Numéro de téléphone:</Form.Label>
+                <Form.Control>
+                  <Form.Input
+                    type="text"
+                    value={numtel}
+                    onChange={handleNumTelChange}
+                    placeholder="Numéro de téléphone"
+                  />
+                </Form.Control>
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label>Sexe:</Form.Label>
+                <Form.Control>
+                  <Form.Radio
+                    value="M"
+                    checked={sexe === "M"}
+                    onChange={handleSexeChange}
+                  >
+                    Homme
+                  </Form.Radio>
+                  <Form.Radio
+                    type="radio"
+                    value="F"
+                    checked={sexe === "F"}
+                    onChange={handleSexeChange}
+                  >
+                    Femme
+                  </Form.Radio>
+                </Form.Control>
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label>Statut:</Form.Label>
+                <Form.Control>
+                  <Form.Radio
+                    type="radio"
+                    value="20"
+                    checked={status === "20"}
+                    onChange={handleStatusChange}
+                  >
+                    Admin
+                  </Form.Radio>
+                  <Form.Radio
+                    type="radio"
+                    value="10"
+                    checked={status === "10"}
+                    onChange={handleStatusChange}
+                  >
+                    Super Admin
+                  </Form.Radio>
+                </Form.Control>
+              </Form.Field>
+
+              <Form.Field>
+                <Button className={styles.button}>S'inscrire</Button>
+              </Form.Field>
+              <Message type={type} message={message} />
+            </form>
+          </Box>
+        </Columns.Column>
+      </Columns>
+    </Container>
+  );
+}
+
+export default AdminSignup;

@@ -1,0 +1,7 @@
+export default function Home() {
+    return(
+        <ul>
+            <li><a href="/superadmin/chauffeurs">Liste chauffeurs Super Admin</a></li>
+        </ul>
+    );
+}

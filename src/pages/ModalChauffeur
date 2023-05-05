@@ -1,0 +1,156 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Button, Columns, Form, Table, Icon } from "react-bulma-components";
+import Message from "../Components/Message";
+import { ReactComponent as SVGClose } from "../assets/svg/close-svgrepo-com.svg";
+import apiCall from "../api/Api";
+
+function ModalChauffeur(props) {
+  const { chauffeurs, setChauffeurs, adminId } = props;
+  const [chauffeurFilter, setChauffeurFilter] = useState("");
+  const [data, setData] = useState(null);
+
+  const [type, setType] = useState("");
+  const [message, setMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
+  const [keyword, setKeyword] = useState(null);
+
+  const [selectedChauffeur, setSelectedChauffeur] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let endpoint = `chauffeur/byAdminId/${adminId}`;
+      endpoint += `?page=${currentPage}`;
+      endpoint += keyword ? `&where=${keyword}` : "";
+
+      const result = await apiCall(endpoint, "GET");
+      setHasNextPage(result.data.hasNextPage);
+      setHasPrevPage(result.data.hasPrevPage);
+      setTotalPage(result.data.totalPages);
+      setData(result.data.result);
+    };
+    fetchData();
+  }, [adminId, setData, currentPage, keyword]);
+
+  const handleSearch = (e) => {
+    if (e.target.value !== null || e.target.value !== "") {
+      setKeyword(e.target.value);
+      setCurrentPage(1);
+    }
+  };
+  const handlePagination = (incrementation) => {
+    setCurrentPage(currentPage + incrementation);
+  };
+
+  function addChauffeur(newChauffeur) {
+    const isChauffeurExist = chauffeurs.find((c) => c.id === newChauffeur.id);
+    if (isChauffeurExist) {
+      alert("Chauffeur deja selectionne");
+      return;
+    }
+    setChauffeurs(() => {
+      if (chauffeurs.length >= 2) {
+        // If there are already 2 chauffeurs, remove the first one
+        return [...chauffeurs.slice(1), newChauffeur];
+      } else {
+        // Otherwise, just append the new chauffeur
+        return [...chauffeurs, newChauffeur];
+      }
+    });
+  }
+  const handleAddChauffeur = () => {
+    const { id, nom, prenom, adresse, telephone } = selectedChauffeur;
+    const newChauffeur = { id, nom, prenom, adresse, telephone };
+    addChauffeur(newChauffeur);
+  };
+
+  return (
+    <>
+      <Columns>
+        <Columns.Column>
+          <Form.Field kind="group">
+            <Form.Control>
+              <Form.Input
+                type="text"
+                placeholder="Chauffeur"
+                value={chauffeurFilter}
+                onChange={(e) => setChauffeurFilter(e.target.value)}
+              />
+            </Form.Control>
+          </Form.Field>
+        </Columns.Column>
+      </Columns>
+
+      <Columns>
+        <Columns.Column>
+          <Table size="fullwidth">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Adresse</th>
+                <th>Téléphone</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data &&
+                data.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.nom}</td>
+                    <td>{item.prenom}</td>
+                    <td>{item.adresse}</td>
+                    <td>{item.telephone}</td>
+                    <td>
+                      <Button onClick={() => setSelectedChauffeur(item)}>
+                        Ajouter
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
+          {totalPage > 1 && (
+            <nav
+              className="pagination is-small"
+              role="navigation"
+              aria-label="pagination"
+            >
+              {hasPrevPage && (
+                <span
+                  className={`pagination-previous`}
+                  onClick={() => handlePagination(-1)}
+                >
+                  Previous
+                </span>
+              )}
+              {hasNextPage && (
+                <span
+                  className={`pagination-next `}
+                  onClick={() => handlePagination(1)}
+                >
+                  Next page
+                </span>
+              )}
+            </nav>
+          )}
+        </Columns.Column>
+      </Columns>
+      {selectedChauffeur && (
+        <div>
+          <p style={{ marginBottom: 0.75 + "em" }}>
+            <b>Chauffeur sélectionné:</b> {selectedChauffeur.nom} (
+            {selectedChauffeur.prenom})
+          </p>
+          <Button onClick={handleAddChauffeur}>Confirmer</Button>
+          <Message type={type} message={message} />
+        </div>
+      )}
+    </>
+  );
+}
+
+export default ModalChauffeur;

@@ -1,0 +1,63 @@
+import { useState } from "react";
+import { Modal, Content, Button, Columns } from "react-bulma-components";
+export default function FindMtrModal(props) {
+    const [listMoyenDeTransport, setListMoyenDeTransport] = useState(null);
+    const { isModalOpen, setIsModalOpen } = props;
+    return (
+        <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            <>
+                <Modal.Card>
+                    <Modal.Card.Header>
+                        <Modal.Card.Title>Recherche moyen de transport</Modal.Card.Title>
+                    </Modal.Card.Header>
+                    <Modal.Card.Body>
+                        <Content className="container">
+                            <Columns>
+                                <div class="field is-horizontal">
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <p class="control is-small">
+                                                <input class="input" type="text" placeholder="Name" />
+                                            </p>
+                                        </div>
+                                        <div class="field">
+                                            <p class="control is-small ">
+                                                <input class="input" type="text" placeholder="Immatriculation" />
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Columns>
+                            <Columns>
+                                <table className="table is-fullwidth is-stripped">
+                                    <thead>
+                                        <tr>
+                                            <th>MTR</th>
+                                            <th>Immatriculation</th>
+                                            <th>Description</th>
+                                            <th>Destination</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {listMoyenDeTransport!==null ?  listMoyenDeTransport.map((item) => (
+                                            <tr key={item.id}>
+                                                <td>{item.id}</td>
+                                                <td>{item.name}</td>
+                                                <td>{item.category}</td>
+                                            </tr>
+                                        )) : <p>no Data</p>}
+                                    </tbody>
+                                </table>
+                            </Columns>
+                        </Content>
+                    </Modal.Card.Body>
+                    <Modal.Card.Footer>
+                        <Button onClick={() => setIsModalOpen(false)}>Close</Button>
+                    </Modal.Card.Footer>
+                </Modal.Card>
+            </>
+
+        </Modal >
+    );
+}

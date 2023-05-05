@@ -1,0 +1,43 @@
+import { useEffect, useState } from "react";
+import apiCall from "../../api/Api";
+import { Modal, Content, Button } from "react-bulma-components";
+export default function ModalChauffeur(props) {
+    const { isModalOpen, selectedRow, setIsModalOpen } = props;
+    const [descChauffeur, setDescChauffeur] = useState(null);
+
+    useEffect(() => {
+        async function fetchData() {
+            const endpoint = 'chauffeur/'+selectedRow.id;
+            const method = 'GET';
+            const responseData = await apiCall(endpoint, method);
+            setDescChauffeur(responseData.data[0]);
+            console.log("response" ,responseData.data);
+        }
+        fetchData();
+    }, [selectedRow.id]);
+    
+    return (
+        <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            {descChauffeur && (
+                <>
+                    <Modal.Card>
+                        <Modal.Card.Header>
+                            <Modal.Card.Title>Information sur {selectedRow.nom} {selectedRow.prenom}</Modal.Card.Title>
+                        </Modal.Card.Header>
+                        <Modal.Card.Body>
+                            <Content>
+                                <p>Adresse: {descChauffeur.adresse}</p>
+                                <p>Telephone : {descChauffeur.telephone}</p>
+                                <p>CIN : {descChauffeur.cin}</p>
+                                <p>Photo : {descChauffeur.photo}</p>
+                            </Content>
+                        </Modal.Card.Body>
+                        <Modal.Card.Footer>
+                            <Button onClick={() => setIsModalOpen(false)}>Close</Button>
+                        </Modal.Card.Footer>
+                    </Modal.Card>
+                </>
+            )}
+        </Modal>
+    );
+}

@@ -1,0 +1,173 @@
+import styles from "../assets/css/Assignation.module.css";
+import "../assets/bulma/bulma.min.css";
+import { useState } from "react";
+
+import ModalDestination from "./ModalDestination";
+import ModalChauffeur from "./ModalChauffeur";
+
+import {
+    Button,
+    Columns,
+    Container,
+    Form,
+    Heading,
+    Modal,
+} from "react-bulma-components";
+import { ReactComponent as SVGPlus } from "../assets/svg/add-svgrepo-com.svg";
+
+function AssignationVoyage() {
+    const [isModalOpenDest, setIsModalOpenDest] = useState(false);
+    const [isModalOpenChauff, setIsModalOpenChauff] = useState(false);
+
+    const [destination, setDestination] = useState("");
+    const [date, setDate] = useState("");
+
+    const handleDestinationChange = (event) => {
+        setDestination(event.target.value);
+    };
+
+    const handleDateChange = (event) => {
+        setDate(event.target.value);
+    };
+
+    const tableData = [
+        { destination: "Paris", date: "2023-04-01" },
+        { destination: "Madrid", date: "2023-04-05" },
+        { destination: "Londres", date: "2023-04-10" },
+        { destination: "New York", date: "2023-04-15" },
+    ];
+
+    const filteredData = tableData.filter(
+        (item) =>
+            item.destination.toLowerCase().includes(destination.toLowerCase()) &&
+            item.date.includes(date)
+    );
+
+    return (
+        <Container style={{ padding: 2 + "vmin" }}>
+            <Heading align="center">Assignation de voyage</Heading>
+
+            <form style={{ paddingTop: 2 + "em" }}>
+                <Columns>
+                    <Columns.Column size={6}>
+                        <Form.Field>
+                            <Form.Label>Moyen de transport</Form.Label>
+                            <Form.Control>
+                                <Form.Select className={styles.select} fullwidth>
+                                    <option>Camion</option>
+                                    <option>Tomobile</option>
+                                </Form.Select>
+                            </Form.Control>
+                        </Form.Field>
+                    </Columns.Column>
+                    <Columns.Column size={6}>
+                        <Form.Field>
+                            <Form.Label>Immatriculation</Form.Label>
+                            <Form.Control>
+                                <Form.Select className={styles.select} fullwidth>
+                                    <option>1552 TAB</option>
+                                    <option>1520 TAD</option>
+                                </Form.Select>
+                            </Form.Control>
+                        </Form.Field>
+                    </Columns.Column>
+
+                    <Columns.Column size={6}>
+                        <div className={styles.right}>
+                            <div>
+                                <Form.Label>Destination</Form.Label>
+                                <span onClick={() => setIsModalOpenDest(true)}>
+                                    <SVGPlus />
+                                </span>
+                            </div>
+                            <div>
+                                <Form.Label>Chauffeur</Form.Label>
+                                <span onClick={() => setIsModalOpenChauff(true)}>
+                                    <SVGPlus />
+                                </span>
+                            </div>
+                        </div>
+                    </Columns.Column>
+                </Columns>
+
+                <Columns>
+                    <Columns.Column>
+                        <div>
+                            <span className={styles.subtitle}>
+                                <b>Destination :</b>
+                            </span>
+                            <span id="ville"></span>
+                        </div>
+                    </Columns.Column>
+                </Columns>
+
+                <Columns>
+                    <Columns.Column>
+                        <div>
+                            <span className={styles.subtitle}>
+                                <b>Chauffeur(s) :</b>
+                            </span>
+                            <ul id="chauffeur" className={styles.listeChauffeur}></ul>
+                        </div>
+                    </Columns.Column>
+                </Columns>
+
+                <Columns>
+                    <Columns.Column size={6}>
+                        <Form.Field>
+                            <Form.Label>Date de disponibilite</Form.Label>
+                            <Form.Control>
+                                <Form.Input type="date" />
+                            </Form.Control>
+                        </Form.Field>
+                    </Columns.Column>
+                </Columns>
+
+                <Columns>
+                    <Columns.Column>
+                        <Button className={styles.button} style={{ width: 7 + "em" }}>
+                            Valider
+                        </Button>
+                    </Columns.Column>
+                </Columns>
+            </form>
+
+            <Modal show={isModalOpenDest} onClose={() => setIsModalOpenDest(false)}>
+                <Modal.Card style={{ padding: 2 + "vmin" }}>
+                    <Modal.Card.Header style={{ backgroundColor: "teal" }}>
+                        <Modal.Card.Title style={{ color: "white" }}>
+                            Recherche Destination
+                        </Modal.Card.Title>
+                    </Modal.Card.Header>
+                    <Modal.Card.Body className={styles.modalCardBody}>
+                        <ModalDestination
+                            isOk={isModalOpenDest}
+                            setIsOk={setIsModalOpenDest}
+                        />
+                    </Modal.Card.Body>
+                </Modal.Card>
+            </Modal>
+
+            <Modal
+                show={isModalOpenChauff}
+                onClose={() => setIsModalOpenChauff(false)}
+            >
+                <Modal.Card style={{ padding: 2 + "vmin" }}>
+                    <Modal.Card.Header style={{ backgroundColor: "teal" }}>
+                        <Modal.Card.Title style={{ color: "white" }}>
+                            Recherche Chauffeur
+                        </Modal.Card.Title>
+                    </Modal.Card.Header>
+                    <Modal.Card.Body className={styles.modalCardBody}>
+                        <ModalChauffeur
+                            isOk={isModalOpenChauff}
+                            setIsOk={setIsModalOpenChauff}
+                        />
+                    </Modal.Card.Body>
+                </Modal.Card>
+            </Modal>
+        </Container>
+    );
+}
+
+export default AssignationVoyage;

@@ -1,0 +1,64 @@
+import { useEffect, useState } from "react";
+import ChauffeurFiltre from "../components/ChauffeurFiltre";
+import ChauffeurListe from "../components/ChauffeurListe";
+import PaginationButtons from "../components/PaginationButtons";
+import { getChauffeurs } from "../data/chauffeurs";
+
+export default function SAdminChauffeurs() {
+    const [chauffeurs, setChauffeurs] = useState([]);
+    const [nombrePages, setNombrePages] = useState(5);
+    const [page, setPages] = useState(2);
+    const [formData, setFormData] = useState({
+        nom: '',
+        prenom: '',
+        adresse: '',
+        ageMin: 0,
+        ageMax: 0,
+        sexe: 'M'
+    });
+
+    const handleChange = event => {
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.value
+        });
+    };
+
+    const submitFiltre = event => {
+        event.preventDefault();
+        /**
+         * alefa le form de ovaina ny liste
+         */
+        console.log('Nom : '+formData.nom);
+        console.log('Prenom : '+formData.prenom);
+        console.log('Adresse : '+formData.adresse);
+        console.log('ageMin : '+formData.ageMin);
+        console.log('ageMax : '+formData.ageMax);
+        console.log('Sexe : '+formData.sexe);
+    }
+    
+    const handlePagination = (page) => {
+        /**
+         * maka anle page vaovao
+         */
+        setPages(page);
+    }
+
+    useEffect(() => {
+        /**
+         * atao eto ny maka any aminy web service
+         * de manao ny calcul ho any pagination rehetra
+         */
+        setChauffeurs(getChauffeurs);
+    }, []);
+
+    return (
+        <>
+            <h2>filtre</h2>
+            <ChauffeurFiltre formData={formData} handleChange={handleChange} submitFiltre={submitFiltre} />
+            <h2>Liste de chauffeurs du super Admin</h2>
+            <ChauffeurListe chauffeurs={chauffeurs} />
+            <PaginationButtons nombrePages={nombrePages} page={page} handlePagination={handlePagination} />
+        </>
+    );
+}

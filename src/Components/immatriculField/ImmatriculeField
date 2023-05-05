@@ -1,0 +1,40 @@
+import { useState, useEffect } from 'react';
+import apiCall from "../../api/Api";
+import styles from "../../assets/css/Assignation.module.css";
+import {
+    Form,
+} from "react-bulma-components";
+
+export default function ImmatriculationField(props) {
+    const { nomMoyenTransportId, setMoyenTransportId, adminId, datedepart, destinationId } = props;
+    const [moyenTransports, setMoyenTransports] = useState(null);
+    const handleClick = (e) => {
+        setMoyenTransportId(e.target.value);
+    };
+    useEffect(() => {
+        async function fetchMoyenTransport() {
+            const endpoint = `moyenTransport/valide/${adminId}/${nomMoyenTransportId}/${destinationId}/${datedepart}`;
+            const method = 'GET';
+            const responseData = await apiCall(endpoint, method);
+            setMoyenTransports(responseData.data);
+        }
+        fetchMoyenTransport();
+    }, [nomMoyenTransportId, adminId, destinationId, datedepart]);
+    return (
+        <Form.Field>
+            <Form.Label>Immatriculation</Form.Label>
+            <Form.Control>
+                <Form.Select className={styles.select} onChange={handleClick} fullwidth>
+                    <option value={null}></option>
+                    {moyenTransports &&
+                        moyenTransports.map((moyenTransport) => {
+                            return (
+                                < option value={moyenTransport.id}>{moyenTransport.immatriculation}</option>
+                            )
+                        })
+                    }
+                </Form.Select>
+            </Form.Control>
+        </Form.Field >
+    );
+}

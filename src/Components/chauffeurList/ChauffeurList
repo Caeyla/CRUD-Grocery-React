@@ -1,0 +1,31 @@
+import React, { useState } from 'react';
+import ModalChauffeur from "./ModalChauffeur";
+
+export default function ChauffeurList(props) {
+    const { chauffeurArray } = props;
+    console.log("chauffeur ", chauffeurArray)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null);
+    const handleRowClick = (chauffeur) => {
+        setSelectedRow(chauffeur);
+        setIsModalOpen(true);
+    };
+    return (
+        <div>
+            <article className="panel is-info">
+                <p className="panel-heading">
+                    Chauffeur(s) :
+                </p>
+                {chauffeurArray &&
+                    chauffeurArray.map((array) => {
+                        return (
+                            <span key={array.chauffeur.id} onClick={() => handleRowClick(array.chauffeur)} className="panel-block is-active">
+                                {array.chauffeur.nom} {array.chauffeur.prenom}
+                            </span>)
+                    })
+                }
+            </article>
+            {selectedRow && <ModalChauffeur isModalOpen={isModalOpen} selectedRow={selectedRow} setIsModalOpen={setIsModalOpen} />}
+        </div>
+    );
+}

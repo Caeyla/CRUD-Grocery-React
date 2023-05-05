@@ -1,0 +1,86 @@
+import React, { useEffect, useState } from 'react';
+import { Columns } from 'react-bulma-components';
+import apiCall from '../../api/Api';
+
+function TransportDetail(props) {
+    const { assignationId } = props;
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(1);
+    const [hasNextPage, setHasNextPage] = useState(false);
+    const [hasPrevPage, setHasPrevPage] = useState(false);
+    const [keyword, setKeyword] = useState(null);
+    const [mTransport, setMTransport] = useState(null);
+
+    const handlePagination = (incrementation) => {
+        setCurrentPage(currentPage + incrementation);
+    }
+    const handleSearch = (e) => {
+        if (e.target.value !== null || e.target.value !== '') {
+            setKeyword(e.target.value);
+            setCurrentPage(1);
+        }
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            let endpoint = `dashboardDetail/${assignationId}?page=${currentPage}`
+            endpoint += keyword ? `&where=${keyword}` : '';
+            const method = 'GET';
+            const responseData = await apiCall(endpoint, method);
+            setHasNextPage(responseData.data.hasNextPage);
+            setHasPrevPage(responseData.data.hasPrevPage);
+            setTotalPage(responseData.data.totalPages);
+            setMTransport(responseData.data.result);
+        }
+        fetchData();
+    }, [assignationId, currentPage, keyword]);
+
+    return (
+        <div className="container">
+            <Columns className='mx-auto'>
+                <div className="field is-horizontal">
+                    <div className="field-body">
+                        <div className="field">
+                            <p className="control">
+                                <input className="input is-info" onChange={handleSearch} placeholder='filtre' type="text" />
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </Columns>
+            <Columns className='mx-auto'>
+                <table className="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>Marchandises</th>
+                            <th>Description</th>
+                            <th>Total paye</th>
+                            <th>Total non paye</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {mTransport && mTransport.map((item) => (
+                            <tr key={item.id}>
+                                <td>{item.designation}</td>
+                                <td>{item.description}</td>
+                                <td>{item.totalpaye}</td>
+                                <td>{item.total - item.totalpaye}</td>
+                                <td>{item.total}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {totalPage > 1 &&
+                    <nav className="pagination is-small" role="navigation" aria-label="pagination">
+                        {hasPrevPage && <span className={`pagination-previous`} onClick={() => handlePagination(-1)} >Previous</span>}
+                        {hasNextPage && <span className={`pagination-next `} onClick={() => handlePagination(1)}>Next page</span>}
+                    </nav>
+                }
+            </Columns>
+        </div >
+    );
+}
+
+export default TransportDetail;

@@ -1,0 +1,124 @@
+import { useState, useEffect } from "react";
+import { Button, Columns, Form, Table } from "react-bulma-components";
+import apiCall from "../api/Api";
+
+function ModalDestination(props) {
+  const { setDestination } = props;
+  const [data, setData] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
+  const [keyword, setKeyword] = useState(null);
+  const [selectedDestination, setSelectedDestination] = useState(null);
+  const villeSpan = document.getElementById("ville");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let endpoint = "destination";
+      endpoint += `?page=${currentPage}`;
+      endpoint += keyword ? `&where=${keyword}` : "";
+      const result = await apiCall(endpoint, "GET");
+      setHasNextPage(result.data.hasNextPage);
+      setHasPrevPage(result.data.hasPrevPage);
+      setTotalPage(result.data.totalPages);
+      setData(result.data.result);
+    };
+    fetchData();
+  }, [setData,keyword, currentPage]);
+
+  const handleSearch = (e) => {
+    if (e.target.value !== null || e.target.value !== "") {
+      setKeyword(e.target.value);
+      setCurrentPage(1);
+    }
+  };
+  const handlePagination = (incrementation) => {
+    setCurrentPage(currentPage + incrementation);
+  };
+  const handleAddDestination = () => {
+    const { id, destination } = selectedDestination;
+    const newDestination = { id, destination };
+    setDestination(newDestination);
+    villeSpan.textContent = " " + newDestination.destination;
+    props.setIsOk(false);
+  };
+
+  return (
+    <>
+      <Columns>
+        <Columns.Column>
+          <Form.Field kind="group">
+            <Form.Control>
+              <Form.Input
+                type="text"
+                placeholder="Destination"
+                value={keyword}
+                onChange={handleSearch}
+              />
+            </Form.Control>
+          </Form.Field>
+        </Columns.Column>
+      </Columns>
+      <Columns>
+        <Columns.Column>
+          <Table size="fullwidth">
+            <thead>
+              <tr>
+                <th>Destination</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data &&
+                data.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.destination}</td>
+                    <td>
+                      <Button onClick={() => setSelectedDestination(item)}>
+                        Ajouter
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
+          {totalPage > 1 && (
+            <nav
+              className="pagination is-small"
+              role="navigation"
+              aria-label="pagination"
+            >
+              {hasPrevPage && (
+                <span
+                  className={`pagination-previous`}
+                  onClick={() => handlePagination(-1)}
+                >
+                  Previous
+                </span>
+              )}
+              {hasNextPage && (
+                <span
+                  className={`pagination-next `}
+                  onClick={() => handlePagination(1)}
+                >
+                  Next page
+                </span>
+              )}
+            </nav>
+          )}
+        </Columns.Column>
+      </Columns>
+      {selectedDestination && (
+        <div>
+          <p style={{ marginBottom: 0.75 + "em" }}>
+            <b>Destination sélectionnée:</b> {selectedDestination.destination}
+          </p>
+          <Button onClick={handleAddDestination}>Confirmer</Button>
+        </div>
+      )}
+    </>
+  );
+}
+
+export default ModalDestination;

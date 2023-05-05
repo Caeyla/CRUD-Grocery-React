@@ -1,0 +1,25 @@
+import * as React from 'react';
+import { Message } from 'react-bulma-components';
+
+
+
+export default function SimpleStatCard(props) {
+    const { title, price } = props
+    const formattedPrice = new Intl.NumberFormat('mg-MG', {
+        style: 'currency',
+        currency: 'MGA',
+        currencyDisplay: 'symbol'
+    }).format(price);
+    return (
+        <Message color="info">
+            <Message.Header>
+                <span>
+                    {title}
+                </span>
+            </Message.Header>
+            <Message.Body>
+                <h4>{formattedPrice}</h4>
+            </Message.Body>
+        </Message>
+    );
+}
