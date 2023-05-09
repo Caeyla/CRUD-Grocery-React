@@ -1,5 +1,5 @@
 function getApiUrl(){
-  return "http://localhost:1676/";
+  return "http://localhost:3001";
 }
 
 module.exports={

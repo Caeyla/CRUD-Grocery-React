@@ -1,45 +1,56 @@
 import { useEffect, useState } from "react";
-import Table from "react-bootstrap/Table";
 import apiCall from "../../api/Api";
+import MyTable from "./Table";
 
 function List(props) {
   const { tableHeader, dataSource, fieldsName } = props;
   const [data, setData] = useState(null);
-  const fieldToshow = fieldsName === null ? tableHeader : fieldsName;
+  const [current_page, setCurrent_page] = useState(1);
+  const [filters, setFilters] = useState(null);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
 
   useEffect(() => {
     async function getData() {
-      const endpoint = dataSource;
+      const endpoint = dataSource + `?_page=${current_page}&_limit=5`;
       const method = "GET";
       const responseData = await apiCall(endpoint, method);
-      setData(responseData.data);
+      responseData !== null
+        ? setData(responseData)
+        : alert("error : responseData === null in List.jsx");
     }
     getData();
-  }, [setData, dataSource]);
+  }, [setData, dataSource, current_page]);
+
+  const handlePagination = (incrementation) => {
+    setCurrent_page(current_page + incrementation);
+  };
+
   return (
-    <Table striped>
-      <thead>
-        <tr>
-          {tableHeader &&
-            tableHeader.map((header) => {
-              return <th>{header}</th>;
-            })}
-        </tr>
-      </thead>
-      <tbody>
-        {data &&
-          data.map((line) => {
-            return (
-              <tr>
-                {fieldToshow &&
-                  fieldToshow.map((fieldName) => {
-                    return <td>{line[fieldName]}</td>;
-                  })}
-              </tr>
-            );
-          })}
-      </tbody>
-    </Table>
+    <div>
+      <MyTable data={data} tableHeader={tableHeader} fieldsName={fieldsName} />
+      <ul>
+        <li>{current_page}</li>
+        <li>
+          <button
+            onClick={() => {
+              handlePagination(1);
+            }}
+          >
+            next page
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => {
+              handlePagination(-1);
+            }}
+          >
+            prev page
+          </button>
+        </li>
+      </ul>
+    </div>
   );
 }
 

@@ -6,14 +6,14 @@ import Assignation from "./pages/Assignation";
 import Login from "./pages/Login";
 import AdminSignup from "./pages/AdminSignup";
 import TravelList from "./pages/TravelList";
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard.jsx';
 import List from './Components/list/List';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/dashboard/:assignationId' element={<Dashboard/>}/>
+        <Route path='/dashboard' element={<Dashboard/>}/>
         <Route path='/' element={<List />} />
         <Route path='/home' element={<Home />} />
         <Route path='/superadmin/chauffeurs' element={<SAdminChauffeurs />} />

@@ -8,7 +8,6 @@ export default async function apiCall(endpoint, method, data) {
             },
             body: data ? JSON.stringify(data) : undefined
         });
-
         if (!response.ok) {
             throw new Error(response.statusText);
         }
